@@ -1,9 +1,10 @@
+import os  
 from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-API_KEY = "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"
+API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
 @app.route("/")
 def home():
@@ -13,6 +14,9 @@ def home():
 def chat():
     user_message = request.json["message"]
     
+    if not API_KEY:
+        return jsonify({"reply": "System Error: API Key missing on server configuration."}), 500
+        
     response = requests.post(
         "https://openrouter.ai/api/v1/chat/completions",
         headers={
@@ -31,12 +35,11 @@ def chat():
     )
     
     data = response.json()
-    
+    if "choices" not in data:
+        return jsonify({"reply": "Error communicating with AI backend."}), 500
+        
     ai_reply = data["choices"][0]["message"]["content"]
-    
-    return jsonify({
-        "reply": ai_reply
-    })
+    return jsonify({"reply": ai_reply})
 
 if __name__ == "__main__":
     app.run(debug=True)
