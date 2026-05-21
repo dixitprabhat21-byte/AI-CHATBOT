@@ -1,17 +1,91 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>PRABHAT CHATBOT</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Enabled Chatbot - Prabhat Kumar Singh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 
-        <link rel="stylesheet" href="/static/style.css">
-    </head>
-    <body>
-        <div class="chat-container">
-            <h1>PRABHAT CHATBOT</h1>
-            <div id="chat-box"></div>
-            <input type="text" id="user-input" placeholder="Type message">
-            <button onclick="sendMessage()">Send</button>
+    <div id="name-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-robot"></i></div>
+            <h2>Welcome to Prabhat's Chatbot</h2>
+            <p>Please enter your name to initialize the secure cloud session.</p>
+            <input type="text" id="username-input" placeholder="Your Name" autocomplete="off">
+            <button onclick="saveUserSession()">Initialize AI <i class="fa-solid fa-arrow-right"></i></button>
         </div>
-        <script src="/static/script.js"></script>
-    </body>
+    </div>
+
+    <div class="app-container">
+        
+        <div class="sidebar">
+            <div class="brand-header">
+                <span class="ai-tag">AI Enabled</span>
+                <h1 class="brand-title">Chatbot <span class="sparkle">✨</span></h1>
+                <p class="brand-subtitle">Smart Conversations, Real Solutions.</p>
+                <div class="glow-line"></div>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-btn active">
+                    <i class="fa-solid fa-comment-dots"></i> Your AI Assistant
+                </button>
+            </div>
+
+            <p class="sidebar-text">Ask anything, get instant answers. I'm here to help you 24/7.</p>
+
+            <div class="sidebar-footer">
+                <div class="footer-item">
+                    <i class="fa-solid fa-microchip animate-pulse"></i>
+                    <div>
+                        <strong>Built with Intelligence.</strong>
+                        <p>Powered by LLaMA 3.2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-workspace">
+            
+            <div class="workspace-header">
+                <div class="greeting-zone">
+                    <h2 id="user-greeting">Hello, User 👋</h2>
+                    <p class="sub-greeting">How can I assist you today?</p>
+                </div>
+                <div class="status-badge">
+                    <span class="status-dot"></span> AI Online
+                </div>
+            </div>
+
+            <div class="chat-stream-box" id="chat-box">
+                </div>
+
+            <div class="suggestion-chips">
+                <button class="chip-btn" onclick="sendSuggestedPrompt('Tell me more')">Tell me more</button>
+                <button class="chip-btn" onclick="sendSuggestedPrompt('Examples of AI')">Examples of AI</button>
+                <button class="chip-btn" onclick="sendSuggestedPrompt('How is AI used?')">How is AI used?</button>
+            </div>
+
+            <div class="input-panel">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-microphone mic-icon"></i>
+                    <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="developer-attribution">
+                    Designed & Developed by <span class="dev-name">Prabhat Kumar Singh</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
 </html>
