@@ -132,6 +132,8 @@ body {
     flex-direction: column;
     padding: 40px;
     background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.03), transparent 400px);
+    height: 100%; /* FIX: Keeps container strictly locked in the page view */
+    overflow: hidden; /* FIX: Prevents items from stretching lower than the window */
 }
 
 .workspace-header {
@@ -140,6 +142,7 @@ body {
     align-items: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding-bottom: 25px;
+    flex-shrink: 0;
 }
 
 .greeting-zone h2 {
@@ -175,14 +178,15 @@ body {
     box-shadow: 0 0 10px #10b981;
 }
 
-/* Scrollable Dialogue Window */
+/* Scrollable Dialogue Window Frame */
 .chat-stream-box {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* FIX: Confines the scrolling action exclusively to this window */
     padding: 25px 0;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    margin-bottom: 15px;
 }
 
 /* Beautiful Rounded Chat Row Elements */
@@ -277,6 +281,7 @@ body {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .chip-btn {
@@ -296,17 +301,18 @@ body {
     border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Secure Input Command Box Console */
+/* Secure Input Command Box Console Layout */
 .input-panel {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex-shrink: 0; /* FIX: Prevents the text field container from collapsing or hiding */
 }
 
 .input-wrapper {
     display: flex;
     align-items: center;
-    background: rgba(7, 10, 19, 0.5);
+    background: #090d16;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
     padding: 6px 10px 6px 20px;
