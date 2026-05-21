@@ -24,27 +24,22 @@ def get_response():
         data = request.get_json() or {}
         user_message = data.get('message', '').strip()
         
-        # Immediate intercept for empty inputs
+        # Intercept for empty inputs - matching your frontend key (.reply)
         if not user_message:
-            return jsonify({'response': "😊 It looks like you sent an empty message! Feel free to ask me anything."})
+            return jsonify({'reply': "😊 It looks like you sent an empty message! Feel free to ask me anything."})
 
         api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
-            return jsonify({'response': "🔑 Configuration Error: API key missing from Render Environment."}), 500
+            return jsonify({'reply': "🔑 Configuration Error: API key missing from Render Environment."}), 500
 
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
 
-        # Enterprise Failover Array Strategy
+        # Simplified payload targeting the most stable free endpoint
         payload = {
-            "model": "meta-llama/llama-3.2-3b-instruct:free",
-            "models": [
-                "google/gemma-2-9b-it:free",
-                "mistralai/mistral-7b-instruct:free",
-                "openrouter/free"
-            ],
+            "model": "meta-llama/llama-3-8b-instruct:free",
             "messages": [
                 {"role": "system", "content": SYSTEM_INSTRUCTION},
                 {"role": "user", "content": user_message}
@@ -60,21 +55,21 @@ def get_response():
         
         if response.status_code == 200:
             result = response.json()
-            # Double-layer check for structural safety inside the API response
             if 'choices' in result and len(result['choices']) > 0:
                 ai_reply = result['choices'][0]['message']['content'].strip()
-                return jsonify({'response': ai_reply})
+                # CRITICAL FIX: Changed from 'response' back to 'reply' to match your script.js variable mapping!
+                return jsonify({'reply': ai_reply})
             else:
-                return jsonify({'response': "⚠️ Received empty structure from AI model backend."})
+                return jsonify({'reply': "⚠️ Received empty structure from AI model backend."})
         else:
             print(f"OpenRouter Error Status: {response.status_code} - Log: {response.text}")
-            return jsonify({'response': "🤖 System load is highly saturated right now. Let's retry that prompt! ✨"}), response.status_code
+            return jsonify({'reply': "🤖 System load is highly saturated right now. Let's retry that prompt! ✨"}), response.status_code
 
     except requests.exceptions.Timeout:
-        return jsonify({'response': "⏳ Connection timed out. Let's try sending that once more! ✨"})
+        return jsonify({'reply': "⏳ Connection timed out. Let's try sending that once more! ✨"})
     except Exception as e:
         print(f"Backend Exception Triggered: {str(e)}")
-        return jsonify({'response': f"⚙️ Server pipeline exception: {str(e)}"}), 500
+        return jsonify({'reply': f"⚙️ Server pipeline exception: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
