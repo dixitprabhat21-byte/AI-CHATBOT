@@ -132,8 +132,8 @@ body {
     flex-direction: column;
     padding: 40px;
     background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.03), transparent 400px);
-    height: 100%; /* FIX: Keeps container strictly locked in the page view */
-    overflow: hidden; /* FIX: Prevents items from stretching lower than the window */
+    height: 100%; 
+    overflow: hidden; 
 }
 
 .workspace-header {
@@ -181,7 +181,7 @@ body {
 /* Scrollable Dialogue Window Frame */
 .chat-stream-box {
     flex-grow: 1;
-    overflow-y: auto; /* FIX: Confines the scrolling action exclusively to this window */
+    overflow-y: auto; 
     padding: 25px 0;
     display: flex;
     flex-direction: column;
@@ -306,7 +306,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex-shrink: 0; /* FIX: Prevents the text field container from collapsing or hiding */
+    flex-shrink: 0; 
 }
 
 .input-wrapper {
@@ -465,3 +465,86 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.2); }
+
+
+/* ==========================================================================
+   CRITICAL RESPONSIVE MOBILE OVERRIDE MATRIX (Fixes Half-Screen cutoffs)
+   ========================================================================== */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .app-container {
+        grid-template-columns: 1fr; /* Drops the sidebar grid partition */
+        width: 100vw;
+        height: 100vh; /* Scaled to max phone display bounds */
+        border-radius: 0;
+        border: none;
+    }
+
+    .sidebar {
+        display: none !important; /* Completely sweeps sidebar off mobile screens */
+    }
+
+    .chat-workspace {
+        padding: 20px 15px 15px 15px; /* Compresses spacing layout tighter */
+        height: 100vh;
+    }
+
+    .greeting-zone h2 {
+        font-size: 22px; /* Scales header typography safely */
+    }
+
+    .sub-greeting {
+        font-size: 13px;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .chat-stream-box {
+        padding: 10px 0;
+    }
+
+    .chat-message-row {
+        max-width: 95%; /* Widens text containers on narrow displays */
+    }
+
+    .message-content {
+        padding: 12px 16px;
+    }
+
+    .message-content p {
+        font-size: 14px;
+    }
+
+    .suggestion-chips {
+        gap: 6px;
+        overflow-x: auto; /* Adds swiping compatibility for prompt chips */
+        padding-bottom: 5px;
+    }
+
+    .chip-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .input-wrapper {
+        padding: 4px 6px 4px 15px;
+    }
+
+    .input-wrapper input {
+        font-size: 14px;
+        padding: 10px 0;
+    }
+
+    .developer-attribution {
+        font-size: 10px;
+        margin-top: 4px;
+    }
+}
