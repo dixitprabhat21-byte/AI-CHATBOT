@@ -18,14 +18,12 @@ SYSTEM_INSTRUCTION = (
 def home():
     return render_template('index.html')
 
-# FIXED: Changed from '/get_response' to '/chat' to perfectly match your script.js!
 @app.route('/chat', methods=['POST'])
 def get_response():
     try:
         data = request.get_json() or {}
         user_message = data.get('message', '').strip()
         
-        # Intercept empty inputs immediately
         if not user_message:
             return jsonify({'reply': "😊 It looks like you sent an empty message! Feel free to ask me anything."})
 
@@ -38,8 +36,9 @@ def get_response():
             "Content-Type": "application/json"
         }
 
+        # SWAPPED: Using the ultra-stable LLaMA 3.2 3B Free model to eliminate saturation errors!
         payload = {
-            "model": "meta-llama/llama-3-8b-instruct:free",
+            "model": "meta-llama/llama-3.2-3b-instruct:free",
             "messages": [
                 {"role": "system", "content": SYSTEM_INSTRUCTION},
                 {"role": "user", "content": user_message}
@@ -57,7 +56,6 @@ def get_response():
             result = response.json()
             if 'choices' in result and len(result['choices']) > 0:
                 ai_reply = result['choices'][0]['message']['content'].strip()
-                # Matches your script.js data.reply perfectly
                 return jsonify({'reply': ai_reply})
             else:
                 return jsonify({'reply': "⚠️ Received empty structure from AI model backend."})
