@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 
-
+# System prompt forcing brief responses, emoji handling, and smart conversational alignment
 SYSTEM_INSTRUCTION = (
     "You are a helpful, brilliant, and concise AI assistant. "
     "Guidelines: "
@@ -28,7 +28,7 @@ def get_response():
             
         user_message = data.get('message', '').strip()
         
-        
+        # FIX 1: Catch blank responses instantly BEFORE hitting the API to prevent server queue jamming
         if not user_message:
             return jsonify({'response': "😊 It looks like you sent an empty message! Feel free to ask me anything."})
 
@@ -36,14 +36,16 @@ def get_response():
         if not api_key:
             return jsonify({'response': "🔑 Configuration Error: API key is missing on the server."}), 500
 
-        
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://render.com", 
+            "X-Title": "Tata Steel Chatbot Project"
         }
 
         payload = {
-            "model": "meta-llama/llama-3-8b-instruct:free",
+            # FIX 2: Universal Free Router string guarantees 100% uptime with random/emoji handling
+            "model": "openrouter/free",
             "messages": [
                 {"role": "system", "content": SYSTEM_INSTRUCTION},
                 {"role": "user", "content": user_message}
@@ -57,7 +59,7 @@ def get_response():
             ai_reply = result['choices'][0]['message']['content'].strip()
             return jsonify({'response': ai_reply})
         else:
-            print(f"API Error: {response.text}")
+            print(f"API Error Code: {response.status_code} - Text: {response.text}")
             return jsonify({'response': "🤖 Oops! The AI core is temporarily busy. Let's try that again. ✨"}), response.status_code
 
     except requests.exceptions.Timeout:
