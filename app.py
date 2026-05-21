@@ -18,13 +18,14 @@ SYSTEM_INSTRUCTION = (
 def home():
     return render_template('index.html')
 
-@app.route('/get_response', methods=['POST'])
+# FIXED: Changed from '/get_response' to '/chat' to perfectly match your script.js!
+@app.route('/chat', methods=['POST'])
 def get_response():
     try:
         data = request.get_json() or {}
         user_message = data.get('message', '').strip()
         
-        # Intercept for empty inputs - matching your frontend key (.reply)
+        # Intercept empty inputs immediately
         if not user_message:
             return jsonify({'reply': "😊 It looks like you sent an empty message! Feel free to ask me anything."})
 
@@ -37,7 +38,6 @@ def get_response():
             "Content-Type": "application/json"
         }
 
-        # Simplified payload targeting the most stable free endpoint
         payload = {
             "model": "meta-llama/llama-3-8b-instruct:free",
             "messages": [
@@ -57,7 +57,7 @@ def get_response():
             result = response.json()
             if 'choices' in result and len(result['choices']) > 0:
                 ai_reply = result['choices'][0]['message']['content'].strip()
-                # CRITICAL FIX: Changed from 'response' back to 'reply' to match your script.js variable mapping!
+                # Matches your script.js data.reply perfectly
                 return jsonify({'reply': ai_reply})
             else:
                 return jsonify({'reply': "⚠️ Received empty structure from AI model backend."})
