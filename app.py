@@ -4,7 +4,6 @@ import requests
 
 app = Flask(__name__)
 
-# System prompt forcing brief responses, emoji handling, and smart conversational alignment
 SYSTEM_INSTRUCTION = (
     "You are a helpful, brilliant, and concise AI assistant. "
     "Guidelines: "
@@ -22,51 +21,60 @@ def home():
 @app.route('/get_response', methods=['POST'])
 def get_response():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'response': "⚠️ Internal system error: No payload received."}), 400
-            
+        data = request.get_json() or {}
         user_message = data.get('message', '').strip()
         
-        # FIX 1: Catch blank responses instantly BEFORE hitting the API to prevent server queue jamming
+        # Immediate intercept for empty inputs
         if not user_message:
             return jsonify({'response': "😊 It looks like you sent an empty message! Feel free to ask me anything."})
 
         api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
-            return jsonify({'response': "🔑 Configuration Error: API key is missing on the server."}), 500
+            return jsonify({'response': "🔑 Configuration Error: API key missing from Render Environment."}), 500
 
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://render.com", 
-            "X-Title": "Tata Steel Chatbot Project"
+            "Content-Type": "application/json"
         }
 
+        # Enterprise Failover Array Strategy
         payload = {
-            # FIX 2: Universal Free Router string guarantees 100% uptime with random/emoji handling
-            "model": "openrouter/free",
+            "model": "meta-llama/llama-3.2-3b-instruct:free",
+            "models": [
+                "google/gemma-2-9b-it:free",
+                "mistralai/mistral-7b-instruct:free",
+                "openrouter/free"
+            ],
             "messages": [
                 {"role": "system", "content": SYSTEM_INSTRUCTION},
                 {"role": "user", "content": user_message}
             ]
         }
 
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=15)
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions", 
+            json=payload, 
+            headers=headers, 
+            timeout=15
+        )
         
         if response.status_code == 200:
             result = response.json()
-            ai_reply = result['choices'][0]['message']['content'].strip()
-            return jsonify({'response': ai_reply})
+            # Double-layer check for structural safety inside the API response
+            if 'choices' in result and len(result['choices']) > 0:
+                ai_reply = result['choices'][0]['message']['content'].strip()
+                return jsonify({'response': ai_reply})
+            else:
+                return jsonify({'response': "⚠️ Received empty structure from AI model backend."})
         else:
-            print(f"API Error Code: {response.status_code} - Text: {response.text}")
-            return jsonify({'response': "🤖 Oops! The AI core is temporarily busy. Let's try that again. ✨"}), response.status_code
+            print(f"OpenRouter Error Status: {response.status_code} - Log: {response.text}")
+            return jsonify({'response': "🤖 System load is highly saturated right now. Let's retry that prompt! ✨"}), response.status_code
 
     except requests.exceptions.Timeout:
-        return jsonify({'response': "⏳ The request timed out. Please try sending your message again! ✨"})
+        return jsonify({'response': "⏳ Connection timed out. Let's try sending that once more! ✨"})
     except Exception as e:
-        print(f"Server Exception: {str(e)}")
-        return jsonify({'response': "⚙️ An unexpected error occurred on the server. Let's reboot this chat! ✨"}), 500
+        print(f"Backend Exception Triggered: {str(e)}")
+        return jsonify({'response': f"⚙️ Server pipeline exception: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
